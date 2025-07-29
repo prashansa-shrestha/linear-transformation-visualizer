@@ -157,7 +157,14 @@ class LinearTransformationVisualizer:
         
         # Initialize font for info panel
         pygame.font.init()
-        self.font = pygame.font.SysFont('arial', 16)
+        # Try to use fonts that better support Unicode characters
+        try:
+            self.font = pygame.font.SysFont('consolas', 16)  # Consolas has good Unicode support
+        except:
+            try:
+                self.font = pygame.font.SysFont('dejavusans', 16)  # DejaVu Sans has excellent Unicode support
+            except:
+                self.font = pygame.font.SysFont('arial', 16)  # Fallback to Arial
         
         # Unit cube in first octant (from origin to (1,1,1))
         self.original_cube = np.array([
@@ -444,9 +451,9 @@ class LinearTransformationVisualizer:
         glColor4f(1.0, 1.0, 1.0, 1.0)
         info_texts = [
             "Current Transformation Matrix:",
-            f"┌ {self.transform_matrix[0,0]:6.2f} {self.transform_matrix[0,1]:6.2f} {self.transform_matrix[0,2]:6.2f} ┐",
-            f"│ {self.transform_matrix[1,0]:6.2f} {self.transform_matrix[1,1]:6.2f} {self.transform_matrix[1,2]:6.2f} │",
-            f"└ {self.transform_matrix[2,0]:6.2f} {self.transform_matrix[2,1]:6.2f} {self.transform_matrix[2,2]:6.2f} ┘",
+            f"╭ {self.transform_matrix[0,0]:.2f} {self.transform_matrix[0,1]:.2f} {self.transform_matrix[0,2]:.2f} ╮",
+            f"│ {self.transform_matrix[1,0]:.2f} {self.transform_matrix[1,1]:.2f} {self.transform_matrix[1,2]:.2f} │",
+            f"╰ {self.transform_matrix[2,0]:.2f} {self.transform_matrix[2,1]:.2f} {self.transform_matrix[2,2]:.2f} ╯",
             "",
             f"Determinant: {np.linalg.det(self.transform_matrix):6.2f}",
             "Controls:",
