@@ -155,6 +155,17 @@ class LinearTransformationVisualizer:
         self.animation_progress = 0
         self.is_animating = False
         
+        # Initialize font for info panel
+        pygame.font.init()
+        # Try to use fonts that better support Unicode characters
+        try:
+            self.font = pygame.font.SysFont('consolas', 16)  # Consolas has good Unicode support
+        except:
+            try:
+                self.font = pygame.font.SysFont('dejavusans', 16)  # DejaVu Sans has excellent Unicode support
+            except:
+                self.font = pygame.font.SysFont('arial', 16)  # Fallback to Arial
+        
         # Unit cube in first octant (from origin to (1,1,1))
         self.original_cube = np.array([
             [0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0],  # bottom face
@@ -420,21 +431,49 @@ class LinearTransformationVisualizer:
         # Draw semi-transparent background
         glColor4f(0.0, 0.0, 0.0, 0.8)
         glBegin(GL_QUADS)
-        glVertex2f(10, 10)
-        glVertex2f(400, 10)
-        glVertex2f(400, 220)
-        glVertex2f(10, 220)
+        glVertex2f(10, 20)
+        glVertex2f(400, 20)
+        glVertex2f(400, 260)
+        glVertex2f(10, 260)
         glEnd()
         
         # Draw border
         glColor4f(0.5, 0.8, 1.0, 1.0)
         glLineWidth(2)
         glBegin(GL_LINE_LOOP)
-        glVertex2f(10, 10)
-        glVertex2f(400, 10)
-        glVertex2f(400, 220)
-        glVertex2f(10, 220)
+        glVertex2f(10, 20)
+        glVertex2f(400, 20)
+        glVertex2f(400, 260)
+        glVertex2f(10, 260)
         glEnd()
+        
+        # Render text information
+        glColor4f(1.0, 1.0, 1.0, 1.0)
+        info_texts = [
+            "Current Transformation Matrix:",
+            f"╭ {self.transform_matrix[0,0]:.2f} {self.transform_matrix[0,1]:.2f} {self.transform_matrix[0,2]:.2f} ╮",
+            f"│ {self.transform_matrix[1,0]:.2f} {self.transform_matrix[1,1]:.2f} {self.transform_matrix[1,2]:.2f} │",
+            f"╰ {self.transform_matrix[2,0]:.2f} {self.transform_matrix[2,1]:.2f} {self.transform_matrix[2,2]:.2f} ╯",
+            "",
+            f"Determinant: {np.linalg.det(self.transform_matrix):6.2f}",
+            "Controls:",
+            "G - Open transformation matrix GUI",
+            "R - Reset to identity matrix",
+            "Mouse drag - Rotate view",
+            "Mouse wheel - Zoom in/out"
+        ]
+        
+        y_offset = 50
+        for text in info_texts:
+            text_surface = self.font.render(text, True, (255, 255, 255))
+            text_data = pygame.image.tostring(text_surface, 'RGBA', True)
+            width = text_surface.get_width()
+            height = text_surface.get_height()
+            
+            
+            glRasterPos2f(30, y_offset)
+            glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_BYTE, text_data)
+            y_offset += 18
         
         glEnable(GL_DEPTH_TEST)
         
